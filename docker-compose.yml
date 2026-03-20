@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  db:
+    build: ./database
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      mynet:
+        ipv4_address: 192.168.1.10
+
+  backend:
+    build: ./backend
+    container_name: backend_app
+    restart: always
+    depends_on:
+      - db
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_HOST: db
+    ports:
+      - "3000:3000"
+    networks:
+      mynet:
+        ipv4_address: 192.168.1.11
+
+volumes:
+  pgdata:
+
+networks:
+  mynet:
+    external: true
